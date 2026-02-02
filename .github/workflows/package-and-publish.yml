@@ -9,6 +9,9 @@ on:
         type: string
         required: true
 
+permissions:
+  contents: write   # required for softprops/action-gh-release to create releases & upload assets
+
 jobs:
   package:
     runs-on: ubuntu-latest
