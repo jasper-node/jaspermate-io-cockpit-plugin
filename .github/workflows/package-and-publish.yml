@@ -1,0 +1,40 @@
+# Package JasperMate IO Cockpit plugin: compress files, create GitHub Release
+name: Package Plugin
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version / tag (e.g. v1.0.0)'
+        type: string
+        required: true
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Compress package
+        run: |
+          PKG_DIR="jaspermate-io"
+          mkdir -p "$PKG_DIR"
+          cp src/manifest.json src/index.html src/jaspermate-io.js src/jaspermate-io.css "$PKG_DIR/"
+          tar -czvf jaspermate-io-${{ inputs.version }}.tar.gz "$PKG_DIR"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jaspermate-io-${{ inputs.version }}
+          path: jaspermate-io-${{ inputs.version }}.tar.gz
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.version }}
+          name: Release ${{ inputs.version }}
+          files: jaspermate-io-${{ inputs.version }}.tar.gz
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
