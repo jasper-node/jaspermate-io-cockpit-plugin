@@ -237,7 +237,7 @@
     if (cards.length === 0) {
       hideLoading();
       if (statusEl) statusEl.textContent = "Monitor and control JasperMate IO cards";
-      container.innerHTML = '<p class="jaspermate-io-hint">No cards. Ensure cm-utils is running and has detected IO cards.</p>';
+      container.innerHTML = '<p class="jaspermate-io-hint">No cards. Ensure jaspermate-utils is running and has detected IO cards.</p>';
       cardElements = {};
       return;
     }

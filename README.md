@@ -14,31 +14,48 @@ A [Cockpit](https://cockpit-project.org/) plugin for monitoring and controlling 
 ## Requirements
 
 - Cockpit (with plugin support)
-- Backend API (e.g. cm-utils) listening on **127.0.0.1:9080** and serving the expected JSON (cards list, `tcpConnected`, and per-card `last` data: `di`, `do`, `ai`, `ao`, `aoType`, `error`, etc.)
+- Backend API (e.g. jm-utils) listening on **127.0.0.1:9080** and serving the expected JSON (cards list, `tcpConnected`, and per-card `last` data: `di`, `do`, `ai`, `ao`, `aoType`, `error`, etc.)
 
-## Installation
+## Install
 
-1. Clone or copy this repo into a Cockpit plugin directory (e.g. under `/usr/share/cockpit/` or your distro’s cockpit package path).
-2. Ensure the plugin directory name matches what Cockpit expects (e.g. `jaspermate-io`) and that `manifest.json` is at the package root.
-3. Reload Cockpit or restart the `cockpit-ws` service if needed.
+Using the install script (downloads a release from GitHub, extracts, and copies to `/usr/share/cockpit/`):
 
-Example layout:
+```bash
+# Latest release
+curl -sL https://raw.githubusercontent.com/jasper-node/jaspermate-io-cockpit-plugin/main/install.sh | sudo sh
+
+# Specific version (e.g. v1.0.0)
+curl -sL https://raw.githubusercontent.com/jasper-node/jaspermate-io-cockpit-plugin/main/install.sh | sudo sh -s -- v1.0.0
+```
+
+The script removes any existing installation before copying the new files. Reload Cockpit or restart `cockpit-ws` if needed.
+
+## Uninstall
+
+```bash
+./install.sh uninstall
+```
+
+Or: `./install.sh --uninstall` / `./install.sh -u`. Removes `/usr/share/cockpit/jaspermate-io`.
+
+## Manual installation
+
+Alternatively, clone or copy this repo into a Cockpit plugin directory (e.g. under `/usr/share/cockpit/` or your distro’s cockpit package path). Ensure the plugin directory name is `jaspermate-io` and that `manifest.json` is at the package root. Example layout:
 
 ```
 /usr/share/cockpit/jaspermate-io/
   manifest.json
-  src/
-    index.html
-    jaspermate-io.js
-    jaspermate-io.css
+  index.html
+  jaspermate-io.js
+  jaspermate-io.css
 ```
 
-`manifest.json` registers the tool and points Cockpit to `src/index.html`.
+`manifest.json` registers the tool and points Cockpit to `index.html`.
 
 ## Usage
 
 1. Log into Cockpit and open **JasperMate IO** from the sidebar/tools.
-2. The page loads cards from the API. If no cards appear, ensure cm-utils (or your backend) is running and has detected IO cards.
+2. The page loads cards from the API. If no cards appear, ensure jm-utils (or your backend) is running and has detected IO cards.
 3. Use **ON/OFF** on DO channels and **SET** on AO channels (opens the analog output modal). Use the **↻** button in a card header to reboot that card.
 
 ## Project structure
