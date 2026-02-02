@@ -1,20 +1,24 @@
 #!/bin/sh
-# Download a GitHub release tarball, extract, and copy to /usr/share/cockpit
+# Install: download a GitHub release, extract, and copy to /usr/share/cockpit
+# Uninstall: remove /usr/share/cockpit/jaspermate-io
+# Usage: ./install.sh [version|latest]   or   ./install.sh uninstall
 set -e
 
-# GitHub repo (owner/repo). Override with GITHUB_REPO env if needed.
-GITHUB_REPO="${GITHUB_REPO:-}"
-if [ -z "$GITHUB_REPO" ] && command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
-  origin="$(git remote get-url origin 2>/dev/null || true)"
-  case "$origin" in
-    https://github.com/*.git) GITHUB_REPO="${origin#https://github.com/}"; GITHUB_REPO="${GITHUB_REPO%.git}" ;;
-    git@github.com:*.git)     GITHUB_REPO="${origin#git@github.com:}"; GITHUB_REPO="${GITHUB_REPO%.git}" ;;
-  esac
-fi
-if [ -z "$GITHUB_REPO" ]; then
-  echo "Set GITHUB_REPO (e.g. owner/jaspermate-io-cockpit-plugin) or run from a git clone."
-  exit 1
-fi
+# GitHub repo (owner/repo). Public repo: jasper-node/jaspermate-io-cockpit-plugin. Override with GITHUB_REPO env if needed.
+GITHUB_REPO="${GITHUB_REPO:-jasper-node/jaspermate-io-cockpit-plugin}"
+
+case "${1:-}" in
+  uninstall|--uninstall|-u)
+    if [ -d /usr/share/cockpit/jaspermate-io ]; then
+      echo "Uninstalling JasperMate IO plugin..."
+      sudo rm -rf /usr/share/cockpit/jaspermate-io
+      echo "Uninstalled."
+    else
+      echo "JasperMate IO plugin is not installed."
+    fi
+    exit 0
+    ;;
+esac
 
 VERSION="${1:-latest}"
 TMPDIR=""
@@ -36,5 +40,9 @@ curl -sL "$URL" -o "$TMPDIR/pkg.tar.gz" || { echo "Download failed (check versio
 tar -xzf "$TMPDIR/pkg.tar.gz" -C "$TMPDIR"
 [ ! -d "$TMPDIR/jaspermate-io" ] && echo "Invalid package layout." && exit 1
 
+if [ -d /usr/share/cockpit/jaspermate-io ]; then
+  echo "Removing old installation..."
+  sudo rm -rf /usr/share/cockpit/jaspermate-io
+fi
 sudo cp -r "$TMPDIR/jaspermate-io" /usr/share/cockpit/
 echo "Installed to /usr/share/cockpit/jaspermate-io (release $TAG)"
