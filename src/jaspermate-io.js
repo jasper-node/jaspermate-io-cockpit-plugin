@@ -259,12 +259,6 @@
     if (!cardsContainer) {
       var hint = container.querySelector(".jaspermate-io-hint");
       if (hint) hint.parentNode.removeChild(hint);
-      if (tcpConnected) {
-        banner = document.createElement("span");
-        banner.className = "jaspermate-io-banner";
-        banner.textContent = "Control disabled (TCP connected)";
-        container.appendChild(banner);
-      }
       cardsContainer = document.createElement("div");
       cardsContainer.className = "jaspermate-io-cards-inner";
       container.appendChild(cardsContainer);
