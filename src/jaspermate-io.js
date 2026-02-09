@@ -8,6 +8,16 @@
   var tcpConnected = false;
   var requestPending = false;
 
+  function getApiErrorMessage(err) {
+    var msg = (err && (err.message != null ? err.message : err)) ? String(err.message != null ? err.message : err) : "Unknown error";
+    if (msg.indexOf("not-found") !== -1 || msg === "not-found") return "JasperMate Utils is not reachable.";
+    return msg;
+  }
+
+  function showApiError(container, err) {
+    if (container) container.innerHTML = '<p class="jaspermate-io-error">' + getApiErrorMessage(err) + "</p>";
+  }
+
   function createCardElement(card) {
     var last = card.last || {};
     var sn = (last.serialNumber && last.serialNumber) ? last.serialNumber : "";
@@ -214,7 +224,7 @@
     if (!raw) {
       try {
         raw = JSON.stringify(data);
-      } catch (e) {}
+      } catch (e) { }
     }
     if (typeof raw === "string") {
       try {
@@ -261,6 +271,7 @@
       if (hint) hint.parentNode.removeChild(hint);
       cardsContainer = document.createElement("div");
       cardsContainer.className = "jaspermate-io-cards-inner";
+      container.innerHTML = '';
       container.appendChild(cardsContainer);
     }
 
@@ -469,8 +480,7 @@
       var state = btn.getAttribute("data-do-state") === "true";
       if (!cardId || index === null) return;
       writeDo(cardId, index, state).then(fetchJasperMateIO, function (err) {
-        var container = document.getElementById("app-container");
-        if (container) container.innerHTML = '<p class="jaspermate-io-error">Error: ' + (err.message || err) + "</p>";
+        showApiError(document.getElementById("app-container"), err);
       });
       return;
     }
@@ -495,8 +505,7 @@
       rebootCard(cardId)
         .then(fetchJasperMateIO)
         .catch(function (err) {
-          var container = document.getElementById("app-container");
-          if (container) container.innerHTML = '<p class="jaspermate-io-error">Error: ' + (err.message || err) + "</p>";
+          showApiError(document.getElementById("app-container"), err);
         });
       return;
     }
@@ -529,9 +538,7 @@
       .catch(function (err) {
         hideLoading();
         if (statusEl) statusEl.textContent = "Monitor and control JasperMate IO cards";
-        if (container) {
-          container.innerHTML = '<p class="jaspermate-io-error">Error: ' + (err.message || err) + "</p>";
-        }
+        showApiError(container, err);
         cardElements = {};
       })
       .finally(function () {
@@ -560,8 +567,7 @@
         aoModalType = "4-20mA";
         updateAOTypeButtons();
         writeAOType(aoModalCardId, aoModalChannel, "4-20mA").then(fetchJasperMateIO).catch(function (err) {
-          var container = document.getElementById("app-container");
-          if (container) container.innerHTML = '<p class="jaspermate-io-error">Error: ' + (err.message || err) + "</p>";
+          showApiError(document.getElementById("app-container"), err);
         });
       });
     }
@@ -572,8 +578,7 @@
         aoModalType = "0-10V";
         updateAOTypeButtons();
         writeAOType(aoModalCardId, aoModalChannel, "0-10V").then(fetchJasperMateIO).catch(function (err) {
-          var container = document.getElementById("app-container");
-          if (container) container.innerHTML = '<p class="jaspermate-io-error">Error: ' + (err.message || err) + "</p>";
+          showApiError(document.getElementById("app-container"), err);
         });
       });
     }
@@ -606,8 +611,7 @@
           })
           .catch(function (err) {
             hideAOModal();
-            var container = document.getElementById("app-container");
-            if (container) container.innerHTML = '<p class="jaspermate-io-error">Error: ' + (err.message || err) + "</p>";
+            showApiError(document.getElementById("app-container"), err);
           });
       });
     }
